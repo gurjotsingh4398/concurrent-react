@@ -1,28 +1,57 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Suspense, Fragment } from "react";
+import { unstable_createResource as createResource } from "react-cache";
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
+import "./App.css";
+
+const APIResource = createResource(() =>
+  fetch("http://www.splashbase.co/api/v1/images/latest").then(res => res.json())
+);
+
+const ImgFetcher = createResource(
+  src =>
+    new Promise(resolve => {
+      const image = new Image();
+      image.onload = () => resolve(src);
+      image.src = src;
+    })
+);
+
+const Img = props => {
+  return (
+    <img
+      alt={props.alt}
+      style={{ width: "100px" }}
+      src={ImgFetcher.read(props.src)}
+    />
+  );
+};
+
+const List = () => {
+  window.console.log(APIResource.read());
+  const data = APIResource.read();
+
+  return (
+    <ul>
+      {data.images.map(item => (
+        <li style={{ listStyle: "none" }} key={item.id}>
+          <Suspense
+            maxDuration={1500}
+            fallback={<img src={item.url} alt={item.id} />}
           >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
-}
+            <Img src={item.url} alt={item.id} />
+          </Suspense>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+const App = () => (
+  <Fragment>
+    <Suspense fallback={<div>Loading...</div>}>
+      <List />
+    </Suspense>
+  </Fragment>
+);
 
 export default App;
