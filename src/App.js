@@ -35,8 +35,11 @@ const List = () => {
       {data.images.map(item => (
         <li style={{ listStyle: "none" }} key={item.id}>
           <Suspense
-            maxDuration={1500}
-            fallback={<img src={item.url} alt={item.id} />}
+            // maxDuration={2000}
+            fallback={
+              <p>Loading...</p>
+              // <img src={item.url} alt={item.id} style={{ width: "100px" }} />
+            }
           >
             <Img src={item.url} alt={item.id} />
           </Suspense>
