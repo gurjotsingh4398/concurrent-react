@@ -1,6 +1,6 @@
 #CONCURRENT REACT
 
-Testing new async features added too react.
+Testing new async features added to react.
 ->react-cache
 ->async mode
 ->suspence
